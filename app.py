@@ -1,538 +1,272 @@
-
 import streamlit as st
-import json
-import os
-import html
 
+# Настройки на страницата
 st.set_page_config(
-    page_title="BookSpace | Digital Library",
+    page_title="Лист&Литера",
     page_icon="📚",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
-FILE_NAME = "books.json"
-
-# ---------------- DATA ----------------
-
-def load_books():
-    if os.path.exists(FILE_NAME):
-        try:
-            with open(FILE_NAME, "r", encoding="utf-8") as file:
-                data = json.load(file)
-                if isinstance(data, list):
-                    return data
-        except (json.JSONDecodeError, OSError):
-            pass
-
-    return [
-        "Хари Потър и Философският камък",
-        "Малкият принц",
-        "Под игото",
-        "Бай Ганьо",
-        "1984",
-        "Властелинът на пръстените",
-        "Алхимикът",
-        "Гордост и предразсъдъци",
-        "Шерлок Холмс",
-        "Пътеводител на галактическия стопаджия",
-        "Момичето с драконовата татуировка",
-        "Престъпление и наказание"
-    ]
-
-
-def save_books():
-    with open(FILE_NAME, "w", encoding="utf-8") as file:
-        json.dump(books, file, ensure_ascii=False, indent=4)
-
-
-if "books" not in st.session_state:
-    st.session_state.books = load_books()
-
-books = st.session_state.books
-
-# ---------------- DESIGN ----------------
-
+# Дизайн
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap');
-
 .stApp {
-    background: #0c1020;
-    color: #f5f3ff;
-    font-family: 'DM Sans', sans-serif;
+    background-color: #f4f7f4;
 }
 
-header[data-testid="stHeader"] {
-    background: transparent;
+h1, h2, h3 {
+    color: #174c38;
 }
 
-.block-container {
-    max-width: 1450px;
-    padding: 2rem 3rem 4rem;
-}
-
-[data-testid="stSidebar"] {
-    background: #111629;
-    border-right: 1px solid #252d45;
-}
-
-[data-testid="stSidebar"] * {
-    color: #e7e5f5;
-}
-
-.brand {
-    font-family: 'Playfair Display', serif;
-    font-size: 30px;
-    font-weight: 800;
-    color: #ffffff;
-    margin-bottom: 4px;
-}
-
-.brand span {
-    color: #aa92ff;
-}
-
-.sidebar-sub {
-    color: #8992af;
-    font-size: 12px;
-    letter-spacing: 2px;
-    margin-bottom: 35px;
-}
-
-.side-label {
-    color: #78839f;
-    font-size: 11px;
-    letter-spacing: 2px;
-    font-weight: 700;
-    margin: 25px 0 12px;
-}
-
-.side-info {
-    background: #1b2240;
-    border: 1px solid #34365c;
-    padding: 18px;
-    border-radius: 15px;
-    margin-top: 30px;
-}
-
-.side-info p {
-    color: #a8a8c3;
-    font-size: 12px;
-}
-
-.hero {
-    position: relative;
-    background: linear-gradient(115deg, #25214e, #252b50 60%, #193b4c);
-    border: 1px solid #49446d;
-    border-radius: 25px;
-    padding: 55px 45px;
-    margin-bottom: 35px;
-    overflow: hidden;
-}
-
-.hero:after {
-    content: '✦';
-    position: absolute;
-    right: 65px;
-    top: 15px;
-    font-size: 150px;
-    color: rgba(255,255,255,0.07);
-}
-
-.hero-tag {
-    color: #c7b9ff;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 3px;
-    margin-bottom: 18px;
-}
-
-.hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(35px, 5vw, 58px);
+.stButton>button {
+    background-color: #176b50;
     color: white;
-    line-height: 1.2;
-    margin: 0;
+    border-radius: 10px;
+    border: none;
+    padding: 10px 20px;
 }
 
-.hero h1 span {
-    color: #b8a5ff;
-}
-
-.hero p {
-    color: #c0c3db;
-    max-width: 520px;
-    font-size: 15px;
-    line-height: 1.8;
-    margin-top: 18px;
-}
-
-.section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 27px;
-    color: #fff;
-    font-weight: 700;
-}
-
-.section-sub {
-    color: #8d96b2;
-    font-size: 13px;
-    margin-top: 5px;
-    margin-bottom: 22px;
-}
-
-.metric-card {
-    background: linear-gradient(145deg, #191f38, #171b30);
-    border: 1px solid #303955;
-    border-radius: 17px;
-    padding: 22px;
-    min-height: 125px;
-}
-
-.metric-icon {
-    font-size: 22px;
-}
-
-.metric-number {
-    font-size: 30px;
-    font-weight: 800;
-    color: #b8a5ff;
-    margin-top: 9px;
-}
-
-.metric-label {
-    color: #9ba4bf;
-    font-size: 12px;
+.stButton>button:hover {
+    background-color: #104832;
+    color: white;
 }
 
 .book-card {
-    background: #171d32;
-    border: 1px solid #2d3651;
-    border-radius: 17px;
-    padding: 15px;
-    transition: all .25s ease;
-    margin-bottom: 10px;
-}
-
-.book-card:hover {
-    border-color: #a18bff;
-    transform: translateY(-5px);
-}
-
-.book-cover {
-    height: 175px;
-    border-radius: 11px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 65px;
-    margin-bottom: 18px;
-}
-
-.cover-1 {
-    background: linear-gradient(145deg, #6146a3, #29244e);
-}
-
-.cover-2 {
-    background: linear-gradient(145deg, #256b78, #193849);
-}
-
-.cover-3 {
-    background: linear-gradient(145deg, #a05b70, #492b54);
-}
-
-.cover-4 {
-    background: linear-gradient(145deg, #9b793c, #4d3c2b);
-}
-
-.cover-5 {
-    background: linear-gradient(145deg, #425c9b, #252c55);
-}
-
-.cover-6 {
-    background: linear-gradient(145deg, #627b62, #283d3b);
-}
-
-.book-category {
-    color: #b39fff;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 2px;
-}
-
-.book-title {
-    color: #fff;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.5;
-    min-height: 47px;
-    margin-top: 9px;
-    overflow-wrap: anywhere;
-}
-
-.book-number {
-    color: #78839e;
-    font-size: 11px;
-    margin-top: 12px;
-}
-
-.add-panel {
-    background: linear-gradient(120deg, #1d2041, #192c43);
-    border: 1px solid #3a4264;
-    border-radius: 19px;
-    padding: 25px;
-    margin: 20px 0 35px;
-}
-
-.stTextInput input {
-    background: #11182c;
-    border: 1px solid #3b4662;
-    color: white;
-    border-radius: 10px;
-}
-
-.stTextInput input:focus {
-    border-color: #a18bff;
-}
-
-.stButton button, .stFormSubmitButton button {
-    background: #8d76ec;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    transition: .2s;
-}
-
-.stButton button:hover, .stFormSubmitButton button:hover {
-    background: #a18bff;
-    color: white;
-    border: none;
-}
-
-hr {
-    border-color: #2a334c;
-}
-
-.stAlert {
+    background-color: white;
+    padding: 18px;
     border-radius: 12px;
-}
-
-.footer {
-    text-align: center;
-    padding: 35px 10px;
-    color: #77819c;
-    font-size: 12px;
-    border-top: 1px solid #252d43;
-    margin-top: 40px;
-}
-
-@media(max-width: 700px) {
-    .block-container {
-        padding: 1rem;
-    }
-    .hero {
-        padding: 35px 22px;
-    }
+    margin-bottom: 12px;
+    border: 1px solid #dce8df;
 }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ---------------- SIDEBAR ----------------
-
-with st.sidebar:
-    st.markdown(
-        '<div class="brand">Book<span>Space.</span></div>',
-        unsafe_allow_html=True
-    )
-
-    st.markdown(
-        '<div class="sidebar-sub">DIGITAL LIBRARY</div>',
-        unsafe_allow_html=True
-    )
-
-    st.markdown('<div class="side-label">MAIN MENU</div>',
-                unsafe_allow_html=True)
-
-    page = st.radio(
-        "Navigation",
-        ["🏠 Начало", "📚 Всички книги", "➕ Добави книга"],
-        label_visibility="collapsed"
-    )
-
-    st.markdown('<div class="side-info">'
-                '<div style="font-size:25px">✨</div>'
-                '<b>Добре дошъл в BookSpace!</b>'
-                '<p>Всяка книга е нов свят, който те очаква.</p>'
-                '</div>', unsafe_allow_html=True)
-
-    st.markdown(
-        '<div style="margin-top:35px;color:#707b99;font-size:11px">'
-        'BOOKSPACE © 2026</div>',
-        unsafe_allow_html=True
-    )
+# Списък с книги
+if "books" not in st.session_state:
+    st.session_state.books = []
 
 
-# ---------------- HERO ----------------
+# Заглавна част
+st.title("📚 Лист&Литера")
+st.subheader("Твоята лична дигитална библиотека")
 
-st.markdown("""
-<div class="hero">
-    <div class="hero-tag">✦ YOUR PERSONAL LIBRARY</div>
-    <h1>Открий своя<br><span>следващ свят.</span></h1>
-    <p>
-        Добре дошъл в твоето лично пространство за книги.
-        Организирай любимите си истории и откривай нови приключения.
-    </p>
-</div>
-""", unsafe_allow_html=True)
+st.write("---")
 
 
-# ---------------- STATISTICS ----------------
-
-col1, col2, col3 = st.columns(3)
-
-statistics = [
-    ("📚", len(books), "ОБЩО КНИГИ"),
-    ("✨", "∞", "БЕЗКРАЙНИ ИСТОРИИ"),
-    ("💜", "24/7", "ТВОЯТА БИБЛИОТЕКА")
-]
-
-for column, item in zip([col1, col2, col3], statistics):
-    with column:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-icon">{item[0]}</div>
-            <div class="metric-number">{item[1]}</div>
-            <div class="metric-label">{item[2]}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-
-# ---------------- ADD BOOK ----------------
-
-def add_book():
-    st.markdown('<div class="section-title">Добави нова книга</div>',
-                unsafe_allow_html=True)
-    st.markdown(
-        '<div class="section-sub">Разшири своята колекция с нова история.</div>',
-        unsafe_allow_html=True
-    )
-
-    with st.form("add_form", clear_on_submit=True):
-        title = st.text_input(
-            "Заглавие на книгата",
-            placeholder="Например: Малкият принц..."
-        )
-
-        submitted = st.form_submit_button(
-            "＋ Добави към библиотеката",
-            use_container_width=True
-        )
-
-        if submitted:
-            title = title.strip()
-
-            if title:
-                books.append(title)
-                save_books()
-                st.success("Книгата е добавена успешно!")
-                st.rerun()
-            else:
-                st.warning("Въведи заглавие на книгата.")
-
-
-# ---------------- BOOK CATALOG ----------------
-
-def show_books():
-    st.markdown('<div class="section-title">Твоята библиотека</div>',
-                unsafe_allow_html=True)
-    st.markdown(
-        '<div class="section-sub">Разгледай всички книги в твоята колекция.</div>',
-        unsafe_allow_html=True
-    )
-
-    search = st.text_input(
+# Меню
+menu = st.sidebar.radio(
+    "📖 Основно меню",
+    [
+        "Начало",
+        "Добавяне на книга",
+        "Всички книги",
         "Търсене",
-        placeholder="🔍 Търси книга по заглавие..."
+        "Изтриване",
+        "Сортиране"
+    ]
+)
+
+
+# НАЧАЛО
+if menu == "Начало":
+
+    st.header("Добре дошъл в своята библиотека!")
+
+    st.write(
+        "Тук можеш да добавяш, разглеждаш, "
+        "търсиш и подреждаш любимите си книги."
     )
 
-    sort = st.selectbox(
-        "Подреди книгите",
-        ["По ред на добавяне", "По азбучен ред", "Обратно по азбучен ред"]
+    st.write("### 📊 Статистика")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric(
+            "Общ брой книги",
+            len(st.session_state.books)
+        )
+
+    with col2:
+        st.metric(
+            "Различни автори",
+            len(set(
+                book["author"]
+                for book in st.session_state.books
+                if book["author"]
+            ))
+        )
+
+    st.write("---")
+    st.success("Твоята библиотека е готова за нови заглавия! 📖")
+
+
+# ДОБАВЯНЕ НА КНИГА
+elif menu == "Добавяне на книга":
+
+    st.header("➕ Добавяне на нова книга")
+
+    title = st.text_input("Заглавие на книгата")
+    author = st.text_input("Автор на книгата")
+
+    genre = st.selectbox(
+        "Жанр",
+        [
+            "Роман",
+            "Фентъзи",
+            "Класика",
+            "Мистерия",
+            "Научна литература",
+            "Биография",
+            "Поезия",
+            "Друг"
+        ]
     )
 
-    displayed_books = []
+    year = st.number_input(
+        "Година на издаване",
+        min_value=0,
+        max_value=2100,
+        value=2024
+    )
 
-    for book in books:
-        if search.casefold() in book.casefold():
-            displayed_books.append(book)
+    if st.button("Добави книга"):
 
-    if sort == "По азбучен ред":
-        displayed_books.sort(key=str.casefold)
-    elif sort == "Обратно по азбучен ред":
-        displayed_books.sort(key=str.casefold, reverse=True)
+        if title.strip() == "":
+            st.error("Моля, въведи заглавие!")
 
-    st.caption(f"Показани {len(displayed_books)} от {len(books)} книги")
+        else:
 
-    if not displayed_books:
-        st.info("📖 Няма намерени книги. Опитай с друго заглавие.")
-        return
+            book = {
+                "title": title,
+                "author": author,
+                "genre": genre,
+                "year": year
+            }
 
-    columns = st.columns(3)
+            st.session_state.books.append(book)
 
-    for index, book in enumerate(displayed_books):
-        with columns[index % 3]:
-            cover_number = (index % 6) + 1
-            safe_title = html.escape(book)
+            st.success("Книгата беше добавена успешно! 📚")
 
-            st.markdown(f"""
-            <div class="book-card">
-                <div class="book-cover cover-{cover_number}">
-                    📖
+
+# ВСИЧКИ КНИГИ
+elif menu == "Всички книги":
+
+    st.header("📚 Всички книги")
+
+    books = st.session_state.books
+
+    if len(books) == 0:
+
+        st.info("Все още няма добавени книги.")
+
+    else:
+
+        for i, book in enumerate(books, start=1):
+
+            st.markdown(
+                f"""
+                <div class="book-card">
+                    <h3>📗 {i}. {book['title']}</h3>
+                    <p><b>Автор:</b> {book['author']}</p>
+                    <p><b>Жанр:</b> {book['genre']}</p>
+                    <p><b>Година:</b> {book['year']}</p>
                 </div>
-                <div class="book-category">BOOKSPACE COLLECTION</div>
-                <div class="book-title">{safe_title}</div>
-                <div class="book-number">BOOK NO. {index + 1:02d}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            if st.button(
-                "🗑 Изтрий книга",
-                key=f"delete_{index}_{book}",
-                use_container_width=True
-            ):
-                books.remove(book)
-                save_books()
-                st.rerun()
+                """,
+                unsafe_allow_html=True
+            )
 
 
-# ---------------- PAGES ----------------
+# ТЪРСЕНЕ ПО ЗАГЛАВИЕ
+elif menu == "Търсене":
 
-if page == "🏠 Начало":
-    st.markdown('<div class="section-title">Добре дошъл в твоя свят от книги</div>',
-                unsafe_allow_html=True)
+    st.header("🔎 Търсене на книга")
 
-    st.markdown(
-        '<div class="section-sub">Твоите истории, събрани на едно място.</div>',
-        unsafe_allow_html=True
-    )
+    search = st.text_input("Въведи заглавие")
 
-    show_books()
+    if search:
 
-elif page == "📚 Всички книги":
-    show_books()
+        found = False
 
-elif page == "➕ Добави книга":
-    add_book()
+        for book in st.session_state.books:
+
+            if search.lower() in book["title"].lower():
+
+                st.success(
+                    f"Намерена книга: {book['title']}"
+                )
+
+                st.write("Автор:", book["author"])
+                st.write("Жанр:", book["genre"])
+                st.write("Година:", book["year"])
+
+                found = True
+
+        if not found:
+            st.warning("Не е намерена такава книга.")
 
 
-# ---------------- FOOTER ----------------
+# ИЗТРИВАНЕ НА КНИГА
+elif menu == "Изтриване":
 
-st.markdown("""
-<div class="footer">
-    BOOKSPACE © 2026<br><br>
-    Made with ♥ for people who love reading.
-</div>
-""", unsafe_allow_html=True)
+    st.header("🗑️ Изтриване на книга")
+
+    books = st.session_state.books
+
+    if len(books) == 0:
+
+        st.info("Няма книги за изтриване.")
+
+    else:
+
+        titles = [
+            book["title"]
+            for book in books
+        ]
+
+        selected = st.selectbox(
+            "Избери книга",
+            titles
+        )
+
+        if st.button("Изтрий избраната книга"):
+
+            for book in books:
+
+                if book["title"] == selected:
+
+                    books.remove(book)
+                    st.success("Книгата беше изтрита!")
+                    st.rerun()
+
+
+# СОРТИРАНЕ ПО АЗБУЧЕН РЕД
+elif menu == "Сортиране":
+
+    st.header("🔤 Сортиране на книгите")
+
+    books = st.session_state.books
+
+    if len(books) == 0:
+
+        st.info("Няма добавени книги.")
+
+    else:
+
+        sorted_books = sorted(
+            books,
+            key=lambda book: book["title"].lower()
+        )
+
+        st.write("### Книги по азбучен ред:")
+
+        for i, book in enumerate(sorted_books, start=1):
+
+            st.write(
+                f"{i}. 📘 {book['title']} - {book['author']}"
+            )
+
+st.write("---")
+
+st.caption("© 2026 Лист&Литера | Твоята лична библиотека 📚")
