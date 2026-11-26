@@ -588,28 +588,28 @@ recommendations = [
 
 if page == "Начало":
 
-    st.markdown("""
-<div class="hero">
-    <div class="eyebrow" style="color:#b9d8c4">
-        ДОБРЕ ДОШЪЛ В СВОЯ СВЯТ ОТ ИСТОРИИ
-    </div>
-
-    <div style="display:flex;align-items:center;gap:20px">
-        <div style="flex:1">
-            <div class="hero-title">
-                Всяка книга е<br>ново приключение.
-            </div>
-
-            <div class="hero-copy">
-                Подреди любимите си заглавия, откривай историите си отново
-                и създай библиотека, която носи твоя почерк.
-            </div>
+    st.html("""
+    <div class="hero">
+        <div class="eyebrow" style="color:#b9d8c4">
+            ДОБРЕ ДОШЪЛ В СВОЯ СВЯТ ОТ ИСТОРИИ
         </div>
 
-        <div class="hero-art">📚</div>
+        <div style="display:flex;align-items:center;gap:20px">
+            <div style="flex:1">
+                <div class="hero-title">
+                    Всяка книга е<br>ново приключение.
+                </div>
+
+                <div class="hero-copy">
+                    Подреди любимите си заглавия, откривай историите си отново
+                    и създай библиотека, която носи твоя почерк.
+                </div>
+            </div>
+
+            <div class="hero-art">📚</div>
+        </div>
     </div>
-</div>
-""", unsafe_allow_html=True)
+    """)
 
     section(
         "Твоята библиотека",
@@ -645,7 +645,6 @@ if page == "Начало":
     )
 
     render_books(list(reversed(books[-4:])))
-
 
 # -------------------- ВСИЧКИ КНИГИ --------------------
 
